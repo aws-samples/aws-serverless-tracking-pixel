@@ -1,0 +1,49 @@
+## Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+## SPDX-License-Identifier: MIT-0
+
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  aws-serverless-tracking-pixel
+
+  This solution deploys a lambda function and an API Gateway HTTP API to process tracking information from the HTTP request, 
+  returning a 1x1 transparent pixel so it can be invoked from an IMG HTML tag
+
+Parameters:
+  KinesisFirehoseARN:
+    Type: String
+    Description: The ARN of the Kinesis Firehose stream where the tracking information will be pushed to
+  KinesisFirehoseStreamName:
+    Type: String
+    Description: The stream name of the Kinesis Firehose stream where the tracking information will be pushed to
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  TrackingPixelProcessing:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: TrackingPixelProcessing/
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Environment:
+        Variables:
+          KINESIS_FIREHOSE_STREAM_NAME: !Ref KinesisFirehoseStreamName
+      Events:
+        TrackingPixelProcessingAPI:
+          Type: HttpApi
+      Policies:
+      - Statement:
+        - Sid: FirehosePutRecord
+          Effect: Allow
+          Action:
+          - firehose:PutRecord
+          Resource: !Ref KinesisFirehoseARN
+
+Outputs:
+  TrackingPixelProcessingAPIURL:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/trackingPixelProcessing"
+  
