@@ -51,7 +51,7 @@ The Amazon Lambda Function code should be modified to parse the desired HTTP req
 Once customized, you can directly begin tracking interactions from web pages or emails from an HTML IMG tag, or from any other event producer you might consider by generating HTTP-GET requests to the URL of the template output. As an example, this would be an HTTP call for the example implementation:
 
 ```bash
-wget https://<your template output domain>?userid=aws_user&thirdpartyname=hightrafficwebsite.com”
+wget https://<your template output domain>?userid=aws_user&thirdpartyname=example.hightrafficwebsite.com”
 ```
 
 ## Developing
